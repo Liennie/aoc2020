@@ -4,7 +4,7 @@ import re, os
 
 input = "input.txt"
 
-valid = 0
+passwords = []
 
 with open(input, 'r') as file:
     for line in file:
@@ -15,12 +15,43 @@ with open(input, 'r') as file:
             letter = match.group(3)
             password = match.group(4)
 
-            count = 0
-            for char in password:
-                if char == letter:
-                    count += 1
+            passwords.append({
+                "min": min,
+                "max": max,
+                "letter": letter,
+                "password": password,
+            })
 
-            if min <= count <= max:
-                valid += 1
+# Part 1
 
-print(valid)
+valid = 0
+for password in passwords:
+    min = password["min"]
+    max = password["max"]
+    letter = password["letter"]
+    word = password["password"]
+
+    count = 0
+    for char in word:
+        if char == letter:
+            count += 1
+
+    if min <= count <= max:
+        valid += 1
+
+print("Part 1:", valid)
+
+# Part 2
+
+valid = 0
+for password in passwords:
+    min = password["min"]
+    max = password["max"]
+    letter = password["letter"]
+    word = password["password"]
+
+    if len(word) >= max:
+        if (word[min-1] == letter) != (word[max-1] == letter):
+            valid += 1
+
+print("Part 2:", valid)
