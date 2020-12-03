@@ -40,14 +40,7 @@ func load(filename string) ([][]byte, error) {
 	return res, nil
 }
 
-func main() {
-	b, err := load(input)
-	if err != nil {
-		log.Printf("Load: %s", err)
-	}
-
-	// Part 1
-
+func trees(b [][]byte, sx, sy int) int {
 	x, y := 0, 0
 	trees := 0
 
@@ -56,9 +49,35 @@ func main() {
 			trees++
 		}
 
-		x = (x + 3) % len(b[y]) // the width is the same for all lines, this is fine
-		y++
+		x = (x + sx) % len(b[y]) // the width is the same for all lines, this is fine
+		y += sy
 	}
 
-	log.Printf("Part 1: %d", trees)
+	return trees
+}
+
+func main() {
+	b, err := load(input)
+	if err != nil {
+		log.Printf("Load: %s", err)
+	}
+
+	// Part 1
+	log.Printf("Part 1: %d", trees(b, 3, 1))
+
+	// Part 2
+	slopes := []struct{ x, y int }{
+		{1, 1},
+		{3, 1},
+		{5, 1},
+		{7, 1},
+		{1, 2},
+	}
+
+	p := 1
+	for _, slope := range slopes {
+		p *= trees(b, slope.x, slope.y)
+	}
+
+	log.Printf("Part 2: %d", p)
 }
