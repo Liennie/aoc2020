@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 const (
@@ -15,10 +16,11 @@ const (
 )
 
 type passport struct {
-	birthYear      int    `field:"byr"`
-	issueYear      int    `field:"iyr"`
-	expirationYear int    `field:"eyr"`
-	height         string `field:"hgt"`
+	birthYear      int `field:"byr"`
+	issueYear      int `field:"iyr"`
+	expirationYear int `field:"eyr"`
+	height         int `field:"hgt"`
+	heightUnit     string
 	hairColor      string `field:"hcl"`
 	eyeColor       string `field:"ecl"`
 	passportID     string `field:"pid"`
@@ -34,6 +36,24 @@ func (p *passport) set(key, value string) {
 		if err != nil {
 			panic(err)
 		}
+	case "hgt":
+		var err error
+		i := strings.IndexFunc(value, func(r rune) bool {
+			return !unicode.IsDigit(r)
+		})
+		if i == -1 {
+			ivalue, err = strconv.Atoi(value)
+			if err != nil {
+				panic(err)
+			}
+			value = ""
+		} else {
+			ivalue, err = strconv.Atoi(value[:i])
+			if err != nil {
+				panic(err)
+			}
+			value = value[i:]
+		}
 	}
 
 	switch key {
@@ -44,7 +64,8 @@ func (p *passport) set(key, value string) {
 	case "eyr":
 		p.expirationYear = ivalue
 	case "hgt":
-		p.height = value
+		p.height = ivalue
+		p.heightUnit = value
 	case "hcl":
 		p.hairColor = value
 	case "ecl":
@@ -60,10 +81,39 @@ func (p *passport) valid() bool {
 	return p.birthYear != 0 &&
 		p.issueYear != 0 &&
 		p.expirationYear != 0 &&
-		p.height != "" &&
+		(p.height != 0 || p.heightUnit != "") &&
 		p.hairColor != "" &&
 		p.eyeColor != "" &&
 		p.passportID != ""
+}
+
+func isHex(s string) bool {
+	_, err := strconv.ParseUint(s, 16, 64)
+	return err == nil
+}
+
+func isColor(s string) bool {
+	switch s {
+	case "amb", "blu", "brn", "gry", "grn", "hzl", "oth":
+		return true
+	}
+	return false
+}
+
+func isDigit(s string) bool {
+	_, err := strconv.ParseUint(s, 10, 64)
+	return err == nil
+}
+
+func (p *passport) validStrict() bool {
+	return p.birthYear >= 1920 && p.birthYear <= 2002 &&
+		p.issueYear >= 2010 && p.issueYear <= 2020 &&
+		p.expirationYear >= 2020 && p.expirationYear <= 2030 &&
+		((p.heightUnit == "cm" && p.height >= 150 && p.height <= 193) ||
+			(p.heightUnit == "in" && p.height >= 59 && p.height <= 76)) &&
+		(len(p.hairColor) == 7 && p.hairColor[0] == '#' && isHex(p.hairColor[1:])) &&
+		isColor(p.eyeColor) &&
+		len(p.passportID) == 9 && isDigit(p.passportID)
 }
 
 func load(filename string) ([]passport, error) {
@@ -124,4 +174,13 @@ func main() {
 		}
 	}
 	log.Printf("Part 1: %d", valid)
+
+	// Part 2
+	valid = 0
+	for _, p := range passports {
+		if p.validStrict() {
+			valid++
+		}
+	}
+	log.Printf("Part 2: %d", valid)
 }
