@@ -87,4 +87,22 @@ func main() {
 		}
 	}
 	log.Printf("Part 1: %d", max)
+
+	// Part 2
+	l := make([]bool, max+1)
+	for _, s := range seats {
+		l[s.id()] = true
+	}
+	found := 0
+	for i, s := range l {
+		if i == 0 || i == max {
+			continue
+		}
+
+		if !s && l[i-1] && l[i+1] {
+			found = i
+			break
+		}
+	}
+	log.Printf("Part 2: %d", found)
 }
