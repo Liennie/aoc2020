@@ -24,6 +24,14 @@ type bag struct {
 	children map[*bag]int
 }
 
+func (b *bag) childrenCount() int {
+	res := 0
+	for child, count := range b.children {
+		res += child.childrenCount()*count + count
+	}
+	return res
+}
+
 type rules map[string]*bag
 
 func (r rules) get(color string) *bag {
@@ -139,4 +147,7 @@ func main() {
 		}
 	}
 	log.Printf("Part 1: %d", len(res)-1)
+
+	// Part 2
+	log.Printf("Part 2: %d", rules["shiny gold"].childrenCount())
 }
