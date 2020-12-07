@@ -103,31 +103,6 @@ func load(filename string) (map[string]*bag, error) {
 	return res, nil
 }
 
-func any(group []map[rune]struct{}) map[rune]struct{} {
-	res := map[rune]struct{}{}
-	for _, m := range group {
-		for r := range m {
-			res[r] = struct{}{}
-		}
-	}
-	return res
-}
-
-func all(group []map[rune]struct{}) map[rune]struct{} {
-	res := map[rune]struct{}{}
-	for r := 'a'; r <= 'z'; r++ {
-		res[r] = struct{}{}
-	}
-	for _, m := range group {
-		for r := range res {
-			if _, ok := m[r]; !ok {
-				delete(res, r)
-			}
-		}
-	}
-	return res
-}
-
 func main() {
 	rules, err := load(input)
 	if err != nil {
