@@ -12,15 +12,15 @@ type Program struct {
 	instructions []Instruction
 }
 
-func (p *Program) Next() DebugInfo {
-	return p.instructions[p.reg.Ip].Debug()
+func (p *Program) Next() Instruction {
+	return p.instructions[p.reg.Ip]
 }
 
 func (p *Program) Step(callbacks ...Callback) error {
 	i := p.instructions[p.reg.Ip]
 
 	for _, callback := range callbacks {
-		err := callback.Pre(i.Debug(), p.Reg())
+		err := callback.Pre(&i, p.reg)
 		if err != nil {
 			return err
 		}
@@ -30,7 +30,7 @@ func (p *Program) Step(callbacks ...Callback) error {
 	i.Exec(p)
 
 	for _, callback := range callbacks {
-		err := callback.Post(i.Debug(), p.Reg())
+		err := callback.Post(&i, p.reg)
 		if err != nil {
 			return err
 		}

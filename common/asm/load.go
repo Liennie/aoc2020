@@ -11,7 +11,7 @@ import (
 	"github.com/liennie/aoc2020/common/asm/op"
 )
 
-func decode(line int, l string) (i Instruction, err error) {
+func decode(line int, l string) (i *Instruction, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("Line %d: %w", line, err)
@@ -59,7 +59,7 @@ func Load(r io.Reader) (*Program, error) {
 				return nil, err
 			}
 			if i != nil {
-				p.instructions = append(p.instructions, i)
+				p.instructions = append(p.instructions, *i)
 			}
 		}
 		if err != nil {

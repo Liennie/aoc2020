@@ -6,62 +6,39 @@ import (
 	"github.com/liennie/aoc2020/common/asm/op"
 )
 
-type Instruction interface {
-	Debug() DebugInfo
-	Exec(*Program)
-}
-
-func newInstruction(line int, o op.Code, args ...int) (Instruction, error) {
-	if len(args) != 1 {
-		return nil, fmt.Errorf("Instruction %s needs 1 arg", o)
-	}
-
-	d := DebugInfo{
-		Line: line,
-		Op:   o,
-		Args: args,
-	}
-
-	switch o {
-	case op.Nop:
-		return nop{d}, nil
-	case op.Acc:
-		return acc{d}, nil
-	case op.Jmp:
-		return jmp{d}, nil
-	}
-
-	return nil, fmt.Errorf("Invalid instruction %s", o)
-}
-
-type DebugInfo struct {
+type Instruction struct {
 	Line int
 	Op   op.Code
 	Args []int
 }
 
-func (d DebugInfo) Debug() DebugInfo {
-	return d
+func newInstruction(line int, o op.Code, args ...int) (*Instruction, error) {
+	if len(args) != 1 {
+		return nil, fmt.Errorf("Instruction %s needs 1 arg", o)
+	}
+
+	return &Instruction{
+		Line: line,
+		Op:   o,
+		Args: args,
+	}, nil
 }
 
-type nop struct {
-	DebugInfo
+func (i Instruction) Exec(p *Program) {
+	exec[i.Op](p, i.Args...)
 }
 
-func (i nop) Exec(p *Program) {}
+var exec = map[op.Code]func(p *Program, args ...int){
+	// Nop
+	op.Nop: func(p *Program, args ...int) {},
 
-type acc struct {
-	DebugInfo
-}
+	// Acc
+	op.Acc: func(p *Program, args ...int) {
+		p.reg.Acc += args[0]
+	},
 
-func (i acc) Exec(p *Program) {
-	p.reg.Acc += i.Args[0]
-}
-
-type jmp struct {
-	DebugInfo
-}
-
-func (i jmp) Exec(p *Program) {
-	p.reg.Ip += i.Args[0] - 1
+	// Jmp
+	op.Jmp: func(p *Program, args ...int) {
+		p.reg.Ip += args[0] - 1
+	},
 }

@@ -3,8 +3,8 @@ package asm
 import "fmt"
 
 type Callback interface {
-	Pre(DebugInfo, Registers) error
-	Post(DebugInfo, Registers) error
+	Pre(*Instruction, Registers) error
+	Post(*Instruction, Registers) error
 }
 
 type simpleLoopDetection struct {
@@ -17,14 +17,14 @@ func SimpleLoopDetection() Callback {
 	}
 }
 
-func (c *simpleLoopDetection) Pre(debug DebugInfo, reg Registers) error {
-	if c.visited[debug.Line] {
-		return fmt.Errorf("Loop detected on line %d", debug.Line)
+func (c *simpleLoopDetection) Pre(i *Instruction, reg Registers) error {
+	if c.visited[i.Line] {
+		return fmt.Errorf("Loop detected on line %d", i.Line)
 	}
-	c.visited[debug.Line] = true
+	c.visited[i.Line] = true
 	return nil
 }
 
-func (c *simpleLoopDetection) Post(debug DebugInfo, reg Registers) error {
+func (c *simpleLoopDetection) Post(i *Instruction, reg Registers) error {
 	return nil
 }
