@@ -1,6 +1,8 @@
 package asm
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Registers struct {
 	Acc int

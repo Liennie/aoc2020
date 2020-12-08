@@ -1,6 +1,8 @@
 package asm
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Callback interface {
 	Pre(*Instruction, Registers) error

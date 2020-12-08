@@ -3,9 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/liennie/aoc2020/common/asm/op"
-
 	"github.com/liennie/aoc2020/common/asm"
+	"github.com/liennie/aoc2020/common/asm/op"
 )
 
 const (
