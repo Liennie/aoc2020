@@ -1,5 +1,7 @@
 package asm
 
+import "fmt"
+
 type Registers struct {
 	Acc int
 	Ip  int
@@ -14,12 +16,57 @@ func (p *Program) Next() DebugInfo {
 	return p.instructions[p.reg.Ip].Debug()
 }
 
-func (p *Program) Step() {
+func (p *Program) Step(callbacks ...Callback) error {
 	i := p.instructions[p.reg.Ip]
+
+	for _, callback := range callbacks {
+		err := callback.Pre(i.Debug(), p.Reg())
+		if err != nil {
+			return err
+		}
+	}
+
 	p.reg.Ip++
 	i.Exec(p)
+
+	for _, callback := range callbacks {
+		err := callback.Post(i.Debug(), p.Reg())
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (p *Program) Reg() Registers {
 	return p.reg
+}
+
+func (p *Program) Reset() {
+	p.reg = Registers{}
+}
+
+func (p *Program) Run(callbacks ...Callback) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("%+v %w", p.reg, err)
+		}
+	}()
+
+	defer func() {
+		if r := recover(); r != nil {
+			if e, ok := r.(error); ok {
+				err = e
+			} else {
+				err = fmt.Errorf("%v", r)
+			}
+		}
+	}()
+
+	for err == nil && p.reg.Ip != len(p.instructions) {
+		err = p.Step(callbacks...)
+	}
+
+	return err
 }

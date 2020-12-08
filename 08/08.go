@@ -17,12 +17,6 @@ func main() {
 	}
 
 	// Part 1
-	visited := map[int]bool{}
-	debug := program.Next()
-	for !visited[debug.Line] {
-		visited[debug.Line] = true
-		program.Step()
-		debug = program.Next()
-	}
+	log.Println(program.Run(asm.SimpleLoopDetection()))
 	log.Printf("Part 1: %d", program.Reg().Acc)
 }
