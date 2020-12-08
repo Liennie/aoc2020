@@ -20,10 +20,10 @@ func SimpleLoopDetection() Callback {
 }
 
 func (c *simpleLoopDetection) Pre(i *Instruction, reg Registers) error {
-	if c.visited[i.Line] {
+	if c.visited[reg.Ip] {
 		return fmt.Errorf("Loop detected on line %d", i.Line)
 	}
-	c.visited[i.Line] = true
+	c.visited[reg.Ip] = true
 	return nil
 }
 

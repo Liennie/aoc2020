@@ -19,7 +19,7 @@ func (p *Program) Next() Instruction {
 }
 
 func (p *Program) Step(callbacks ...Callback) error {
-	i := p.instructions[p.reg.Ip]
+	i := p.Next()
 
 	for _, callback := range callbacks {
 		err := callback.Pre(&i, p.reg)
@@ -29,7 +29,7 @@ func (p *Program) Step(callbacks ...Callback) error {
 	}
 
 	p.reg.Ip++
-	i.Exec(p)
+	p.Exec(i)
 
 	for _, callback := range callbacks {
 		err := callback.Post(&i, p.reg)

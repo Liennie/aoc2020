@@ -31,21 +31,18 @@ func newInstruction(line int, o op.Code, args ...int) (*Instruction, error) {
 	return i, nil
 }
 
-func (i Instruction) Exec(p *Program) {
-	exec[i.Op](p, i.Args)
-}
+func (p *Program) Exec(i Instruction) {
+	switch i.Op {
+	case op.Nop:
+		// Do nothing
 
-var exec = map[op.Code]func(p *Program, args [argc]int){
-	// Nop
-	op.Nop: func(p *Program, args [argc]int) {},
+	case op.Acc:
+		p.reg.Acc += i.Args[0]
 
-	// Acc
-	op.Acc: func(p *Program, args [argc]int) {
-		p.reg.Acc += args[0]
-	},
+	case op.Jmp:
+		p.reg.Ip += i.Args[0] - 1
 
-	// Jmp
-	op.Jmp: func(p *Program, args [argc]int) {
-		p.reg.Ip += args[0] - 1
-	},
+	default:
+		panic(fmt.Errorf("Invalid instruction %s", i.Op))
+	}
 }
