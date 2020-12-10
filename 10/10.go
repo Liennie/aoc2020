@@ -55,4 +55,18 @@ func main() {
 		}
 	}
 	log.Printf("Part 1: %d", d1*d3)
+
+	// Part 2
+	w := map[int]int{
+		numbers[len(numbers)-1]: 1,
+	}
+	for i := len(numbers) - 2; i >= 0; i-- {
+		for j := i + 1; j < len(numbers); j++ {
+			if numbers[j]-numbers[i] > 3 {
+				break
+			}
+			w[numbers[i]] += w[numbers[j]]
+		}
+	}
+	log.Printf("Part 2: %d", w[0])
 }
