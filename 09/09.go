@@ -51,4 +51,31 @@ loop1:
 		break
 	}
 	log.Printf("Part 1: %d", n)
+
+	// Part 2
+	min, max := -1, -1
+loop2:
+	for i := 0; i < len(numbers)-1; i++ {
+		for j := i + 1; j < len(numbers); j++ {
+			sum := 0
+			mn, mx := numbers[i], numbers[i]
+			for k := i; k <= j; k++ {
+				nk := numbers[k]
+
+				sum += nk
+
+				if nk < mn {
+					mn = nk
+				} else if nk > mx {
+					mx = nk
+				}
+			}
+			if sum == n {
+				min = mn
+				max = mx
+				break loop2
+			}
+		}
+	}
+	log.Printf("Part 2: %d", min+max)
 }
