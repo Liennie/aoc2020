@@ -61,38 +61,85 @@ func occupied(seats [][]rune, x, y int) int {
 	return count
 }
 
-func main() {
-	defer recover.Err(log.Err)
-
-	seats := parse(input)
-
-	// Part 1
-	next := clone(seats)
-	modified := true
-	for modified {
-		modified = false
-		for y, row := range seats {
-			for x, seat := range row {
-				if seat == 'L' && occupied(seats, x, y) == 0 {
-					next[y][x] = '#'
-					modified = true
-				} else if seat == '#' && occupied(seats, x, y) >= 4 {
-					next[y][x] = 'L'
-					modified = true
+func occupied2(seats [][]rune, x, y int) int {
+	count := 0
+	for yd := -1; yd <= 1; yd++ {
+		for xd := -1; xd <= 1; xd++ {
+			if yd != 0 || xd != 0 {
+				for i, j := y+yd, x+xd; i >= 0 && i < len(seats) && j >= 0 && j < len(seats[i]); i, j = i+yd, j+xd {
+					if seats[i][j] == '#' {
+						count++
+						break
+					} else if seats[i][j] == 'L' {
+						break
+					}
 				}
 			}
 		}
-		copy2d(seats, next)
 	}
+	return count
+}
 
-	count := 0
+func count(seats [][]rune, s rune) int {
+	c := 0
 	for _, row := range seats {
 		for _, seat := range row {
-			if seat == '#' {
-				count++
+			if seat == s {
+				c++
 			}
 		}
 	}
+	return c
+}
 
-	log.Part1(count)
+func foreach(seats [][]rune, f func(r rune, x, y int)) {
+	for y, row := range seats {
+		for x, seat := range row {
+			f(seat, x, y)
+		}
+	}
+}
+
+func main() {
+	defer recover.Err(log.Err)
+
+	start := parse(input)
+
+	// Part 1
+	seats := clone(start)
+	next := clone(start)
+	modified := true
+	for modified {
+		modified = false
+		foreach(seats, func(r rune, x, y int) {
+			if r == 'L' && occupied(seats, x, y) == 0 {
+				next[y][x] = '#'
+				modified = true
+			} else if r == '#' && occupied(seats, x, y) >= 4 {
+				next[y][x] = 'L'
+				modified = true
+			}
+		})
+		copy2d(seats, next)
+	}
+	log.Part1(count(seats, '#'))
+
+	// Part 2
+	copy2d(seats, start)
+	copy2d(next, start)
+	modified = true
+	for modified {
+		modified = false
+		foreach(seats, func(r rune, x, y int) {
+			if r == 'L' && occupied2(seats, x, y) == 0 {
+				next[y][x] = '#'
+				modified = true
+			} else if r == '#' && occupied2(seats, x, y) >= 5 {
+				next[y][x] = 'L'
+				modified = true
+			}
+		})
+		copy2d(seats, next)
+	}
+	log.Part2(count(seats, '#'))
 }
