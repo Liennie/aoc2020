@@ -8,21 +8,15 @@ import (
 	"strings"
 )
 
-type Res struct {
-	Line string
-	Err  error
-}
-
-func File(filename string) <-chan Res {
-	ch := make(chan Res)
+func File(filename string) <-chan string {
+	ch := make(chan string)
 
 	go func() {
 		defer close(ch)
 
 		file, err := os.Open(filename)
 		if err != nil {
-			ch <- Res{"", err}
-			return
+			panic(fmt.Errorf("os.Open: %w", err))
 		}
 		defer file.Close()
 
@@ -30,11 +24,11 @@ func File(filename string) <-chan Res {
 		for {
 			l, err := r.ReadString('\n')
 			if len(l) > 0 {
-				ch <- Res{strings.TrimSuffix(l, "\n"), nil}
+				ch <- strings.TrimSuffix(l, "\n")
 			}
 			if err != nil {
 				if err != io.EOF {
-					ch <- Res{"", fmt.Errorf("ReadString: %w", err)}
+					panic(fmt.Errorf("ReadString: %w", err))
 				}
 				return
 			}

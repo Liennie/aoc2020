@@ -2,39 +2,35 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"sort"
 	"strconv"
 
 	"github.com/liennie/aoc2020/common/load"
+	"github.com/liennie/aoc2020/common/log"
+	"github.com/liennie/aoc2020/common/recover"
 )
 
 const (
 	input = "input.txt"
 )
 
-func parse(filename string) ([]int, error) {
+func parse(filename string) []int {
 	res := []int{}
 	for l := range load.File(filename) {
-		if l.Err != nil {
-			return nil, l.Err
-		}
-
-		i, err := strconv.Atoi(l.Line)
+		i, err := strconv.Atoi(l)
 		if err != nil {
-			return nil, fmt.Errorf("Atoi: %w", err)
+			panic(fmt.Errorf("Atoi: %w", err))
 		}
 
 		res = append(res, i)
 	}
-	return res, nil
+	return res
 }
 
 func main() {
-	numbers, err := parse(input)
-	if err != nil {
-		log.Printf("Parse: %s", err)
-	}
+	defer recover.Err(log.Err)
+
+	numbers := parse(input)
 
 	sort.Ints(numbers)
 
