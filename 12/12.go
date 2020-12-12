@@ -56,6 +56,9 @@ func parse(filename string) []nav {
 }
 
 func sin(a int) int {
+	if a < 0 {
+		a += 360
+	}
 	switch a {
 	case 0:
 		return 0
@@ -71,6 +74,9 @@ func sin(a int) int {
 }
 
 func cos(a int) int {
+	if a < 0 {
+		a += 360
+	}
 	switch a {
 	case 0:
 		return 1
@@ -92,6 +98,24 @@ func abs(i int) int {
 	return i
 }
 
+func rot(x, y, a int) (int, int) {
+	if a < 0 {
+		a += 360
+	}
+	switch a {
+	case 0:
+		return x, y
+	case 90:
+		return -y, x
+	case 180:
+		return -x, -y
+	case 270:
+		return y, -x
+	default:
+		panic(fmt.Errorf("Rot: %d", a))
+	}
+}
+
 func main() {
 	defer recover.Err(log.Err)
 
@@ -103,14 +127,27 @@ func main() {
 		if dir.t%90 != 0 {
 			panic("Noooo")
 		}
+
 		ship.t += dir.t
 		ship.t %= 360
-		if ship.t < 0 {
-			ship.t += 360
-		}
-
 		ship.x += dir.x + dir.f*cos(ship.t)
 		ship.y += dir.y + dir.f*sin(ship.t)
 	}
 	log.Part1(abs(ship.x) + abs(ship.y))
+
+	// Part2
+	ship = nav{0, 0, 0, 0}
+	way := nav{10, 1, 0, 0}
+	for _, dir := range navigation {
+		if dir.t%90 != 0 {
+			panic("Noooo")
+		}
+
+		way.x += dir.x
+		way.y += dir.y
+		way.x, way.y = rot(way.x, way.y, dir.t)
+		ship.x += dir.f * way.x
+		ship.y += dir.f * way.y
+	}
+	log.Part2(abs(ship.x) + abs(ship.y))
 }
