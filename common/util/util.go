@@ -1,5 +1,10 @@
 package util
 
+import (
+	"fmt"
+	"strconv"
+)
+
 func Mod(a, b int) int {
 	m := a % b
 	if m < 0 {
@@ -38,4 +43,16 @@ func GCD(a, b int) int {
 
 func LCM(a, b int) int {
 	return Abs(a*b) / GCD(a, b)
+}
+
+func Atoi(s string) int {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		Panic("Atoi(%s): %w", s, err)
+	}
+	return i
+}
+
+func Panic(format string, a ...interface{}) {
+	panic(fmt.Errorf(format, a...))
 }

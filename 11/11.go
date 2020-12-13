@@ -4,6 +4,7 @@ import (
 	"github.com/liennie/aoc2020/common/load"
 	"github.com/liennie/aoc2020/common/log"
 	"github.com/liennie/aoc2020/common/recover"
+	"github.com/liennie/aoc2020/common/util"
 )
 
 const (
@@ -19,7 +20,7 @@ func parse(filename string) [][]rune {
 }
 
 func copy2d(dst [][]rune, src [][]rune) {
-	for y := 0; y < min(len(dst), len(src)); y++ {
+	for y := 0; y < util.Min(len(dst), len(src)); y++ {
 		copy(dst[y], src[y])
 	}
 }
@@ -35,24 +36,10 @@ func clone(seats [][]rune) [][]rune {
 	return res
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
 func occupied(seats [][]rune, x, y int) int {
 	count := 0
-	for i := max(y-1, 0); i < min(y+2, len(seats)); i++ {
-		for j := max(x-1, 0); j < min(x+2, len(seats[i])); j++ {
+	for i := util.Max(y-1, 0); i < util.Min(y+2, len(seats)); i++ {
+		for j := util.Max(x-1, 0); j < util.Min(x+2, len(seats[i])); j++ {
 			if (i != y || j != x) && seats[i][j] == '#' {
 				count++
 			}

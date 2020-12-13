@@ -1,13 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"sort"
-	"strconv"
 
 	"github.com/liennie/aoc2020/common/load"
 	"github.com/liennie/aoc2020/common/log"
 	"github.com/liennie/aoc2020/common/recover"
+	"github.com/liennie/aoc2020/common/util"
 )
 
 const (
@@ -17,12 +16,7 @@ const (
 func parse(filename string) []int {
 	res := []int{}
 	for l := range load.File(filename) {
-		i, err := strconv.Atoi(l)
-		if err != nil {
-			panic(fmt.Errorf("Atoi: %w", err))
-		}
-
-		res = append(res, i)
+		res = append(res, util.Atoi(l))
 	}
 	return res
 }
@@ -50,7 +44,7 @@ func main() {
 			panic("Vegeta, what does the scouter say about his power level?")
 		}
 	}
-	log.Printf("Part 1: %d", d1*d3)
+	log.Part1(d1 * d3)
 
 	// Part 2
 	w := map[int]int{
@@ -64,5 +58,5 @@ func main() {
 			w[numbers[i]] += w[numbers[j]]
 		}
 	}
-	log.Printf("Part 2: %d", w[0])
+	log.Part2(w[0])
 }

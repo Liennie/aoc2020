@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/liennie/aoc2020/common/load"
@@ -17,15 +15,8 @@ const (
 
 func parse(filename string) (int, map[int]int) {
 	ch := load.File(filename)
-	defer func() {
-		for range ch {
-		}
-	}()
 
-	t, err := strconv.Atoi(<-ch)
-	if err != nil {
-		panic(fmt.Errorf("Atoi: %w", err))
-	}
+	t := util.Atoi(<-ch)
 
 	res := map[int]int{}
 	for i, s := range strings.Split(<-ch, ",") {
@@ -33,12 +24,7 @@ func parse(filename string) (int, map[int]int) {
 			continue
 		}
 
-		n, err := strconv.Atoi(s)
-		if err != nil {
-			panic(fmt.Errorf("Atoi: %w", err))
-		}
-
-		res[i] = n
+		res[i] = util.Atoi(s)
 	}
 
 	return t, res
@@ -77,7 +63,7 @@ func main() {
 			oo := (m * i) % cm
 
 			if mod[oo] {
-				panic(fmt.Errorf("Oh noes: %v", map[string]interface{}{"co": co, "cm": cm, "o": o, "m": m, "i": i, "mod": mod}))
+				util.Panic("Oh noes: %v", map[string]interface{}{"co": co, "cm": cm, "o": o, "m": m, "i": i, "mod": mod})
 			}
 			mod[oo] = true
 

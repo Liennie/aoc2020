@@ -1,12 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"strconv"
-
 	"github.com/liennie/aoc2020/common/load"
 	"github.com/liennie/aoc2020/common/log"
 	"github.com/liennie/aoc2020/common/recover"
+	"github.com/liennie/aoc2020/common/util"
 )
 
 const (
@@ -37,13 +35,10 @@ func parse(filename string) []nav {
 		case 'F':
 			dir = nav{0, 0, 1, 0}
 		default:
-			panic(fmt.Errorf("Invalid direction: %q", l[:1]))
+			util.Panic("Invalid direction: %q", l[:1])
 		}
 
-		i, err := strconv.Atoi(l[1:])
-		if err != nil {
-			panic(fmt.Errorf("Atoi: %w", err))
-		}
+		i := util.Atoi(l[1:])
 
 		dir.x *= i
 		dir.y *= i
@@ -69,8 +64,9 @@ func sin(a int) int {
 	case 270:
 		return -1
 	default:
-		panic(fmt.Errorf("Sin: %d", a))
+		util.Panic("Sin: %d", a)
 	}
+	return 0
 }
 
 func cos(a int) int {
@@ -87,15 +83,9 @@ func cos(a int) int {
 	case 270:
 		return 0
 	default:
-		panic(fmt.Errorf("Cos: %d", a))
+		util.Panic("Cos: %d", a)
 	}
-}
-
-func abs(i int) int {
-	if i < 0 {
-		return -i
-	}
-	return i
+	return 0
 }
 
 func rot(x, y, a int) (int, int) {
@@ -112,8 +102,9 @@ func rot(x, y, a int) (int, int) {
 	case 270:
 		return y, -x
 	default:
-		panic(fmt.Errorf("Rot: %d", a))
+		util.Panic("Rot: %d", a)
 	}
+	return 0, 0
 }
 
 func main() {
@@ -133,7 +124,7 @@ func main() {
 		ship.x += dir.x + dir.f*cos(ship.t)
 		ship.y += dir.y + dir.f*sin(ship.t)
 	}
-	log.Part1(abs(ship.x) + abs(ship.y))
+	log.Part1(util.Abs(ship.x) + util.Abs(ship.y))
 
 	// Part2
 	ship = nav{0, 0, 0, 0}
@@ -149,5 +140,5 @@ func main() {
 		ship.x += dir.f * way.x
 		ship.y += dir.f * way.y
 	}
-	log.Part2(abs(ship.x) + abs(ship.y))
+	log.Part2(util.Abs(ship.x) + util.Abs(ship.y))
 }
