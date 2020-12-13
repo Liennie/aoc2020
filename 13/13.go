@@ -8,13 +8,14 @@ import (
 	"github.com/liennie/aoc2020/common/load"
 	"github.com/liennie/aoc2020/common/log"
 	"github.com/liennie/aoc2020/common/recover"
+	"github.com/liennie/aoc2020/common/util"
 )
 
 const (
 	input = "input.txt"
 )
 
-func parse(filename string) (int, []int) {
+func parse(filename string) (int, map[int]int) {
 	ch := load.File(filename)
 	defer func() {
 		for range ch {
@@ -26,8 +27,8 @@ func parse(filename string) (int, []int) {
 		panic(fmt.Errorf("Atoi: %w", err))
 	}
 
-	res := []int{}
-	for _, s := range strings.Split(<-ch, ",") {
+	res := map[int]int{}
+	for i, s := range strings.Split(<-ch, ",") {
 		if s == "x" {
 			continue
 		}
@@ -37,7 +38,7 @@ func parse(filename string) (int, []int) {
 			panic(fmt.Errorf("Atoi: %w", err))
 		}
 
-		res = append(res, n)
+		res[i] = n
 	}
 
 	return t, res
@@ -63,4 +64,29 @@ func main() {
 		}
 	}
 	log.Part1(min * minId)
+
+	// Part 2
+	co, cm := 0, 1
+	for o, m := range ids {
+		if cm > m {
+			co, cm, o, m = o, m, co, cm
+		}
+
+		mod := map[int]bool{}
+		for i := 1; ; i++ {
+			oo := (m * i) % cm
+
+			if mod[oo] {
+				panic(fmt.Errorf("Oh noes: %v", map[string]interface{}{"co": co, "cm": cm, "o": o, "m": m, "i": i, "mod": mod}))
+			}
+			mod[oo] = true
+
+			if oo == util.Mod(o-co, cm) {
+				cm = util.LCM(m, cm)
+				co = cm - (m*i - o)
+				break
+			}
+		}
+	}
+	log.Part2(cm - co)
 }
