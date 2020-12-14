@@ -4,11 +4,9 @@ import (
 	"math"
 	"regexp"
 
-	"github.com/liennie/aoc2020/common/util"
-
 	"github.com/liennie/aoc2020/common/load"
 	"github.com/liennie/aoc2020/common/log"
-	"github.com/liennie/aoc2020/common/recover"
+	"github.com/liennie/aoc2020/common/util"
 )
 
 const (
@@ -97,7 +95,7 @@ func parse2(filename string) map[int]uint64 {
 }
 
 func main() {
-	defer recover.Err(log.Err)
+	defer util.Recover(log.Err)
 
 	// Part 1
 	sum := uint64(0)

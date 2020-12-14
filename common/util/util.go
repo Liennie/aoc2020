@@ -57,6 +57,17 @@ func Panic(format string, a ...interface{}) {
 	panic(fmt.Errorf(format, a...))
 }
 
+func Recover(f func(err error)) {
+	if e := recover(); e != nil {
+		switch e.(type) {
+		case error:
+			f(e.(error))
+		default:
+			f(fmt.Errorf("%v", e))
+		}
+	}
+}
+
 func Perm(n int) [][]int {
 	if n < 0 {
 		Panic("Perm(%d)", n)

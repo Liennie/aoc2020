@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/liennie/aoc2020/common/load"
 	"github.com/liennie/aoc2020/common/log"
-	"github.com/liennie/aoc2020/common/recover"
 	"github.com/liennie/aoc2020/common/util"
 )
 
@@ -108,7 +107,7 @@ func rot(x, y, a int) (int, int) {
 }
 
 func main() {
-	defer recover.Err(log.Err)
+	defer util.Recover(log.Err)
 
 	navigation := parse(input)
 

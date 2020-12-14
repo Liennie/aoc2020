@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/liennie/aoc2020/common/load"
 	"github.com/liennie/aoc2020/common/log"
-	"github.com/liennie/aoc2020/common/recover"
 	"github.com/liennie/aoc2020/common/util"
 )
 
@@ -88,7 +87,7 @@ func foreach(seats [][]rune, f func(r rune, x, y int)) {
 }
 
 func main() {
-	defer recover.Err(log.Err)
+	defer util.Recover(log.Err)
 
 	start := parse(input)
 
