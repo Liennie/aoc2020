@@ -68,7 +68,7 @@ func Recover(f func(err error)) {
 	}
 }
 
-func Perm(n int) [][]int {
+func Comb(n int) [][]int {
 	if n < 0 {
 		Panic("Perm(%d)", n)
 	}
@@ -77,7 +77,7 @@ func Perm(n int) [][]int {
 		return [][]int{{}}
 	}
 
-	res := Perm(n - 1)
+	res := Comb(n - 1)
 	l := len(res)
 	for i := 0; i < l; i++ {
 		p := make([]int, len(res[i]))

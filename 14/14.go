@@ -49,7 +49,6 @@ func parse1(filename string) map[int]uint64 {
 		} else if match = memRe.FindStringSubmatch(l); len(match) == 3 {
 			mem[util.Atoi(match[1])] = (uint64(util.Atoi(match[2])) & maskAnd) | maskOr
 		} else {
-			log.Println(len(match))
 			util.Panic("No match for %q", l)
 		}
 	}
@@ -65,7 +64,7 @@ func floatMasks(float uint64) []uint64 {
 	}
 
 	res := []uint64{}
-	for _, p := range util.Perm(len(bits)) {
+	for _, p := range util.Comb(len(bits)) {
 		mask := uint64(0)
 		for _, i := range p {
 			mask |= 1 << bits[i]
@@ -87,7 +86,6 @@ func parse2(filename string) map[int]uint64 {
 				mem[int((uint64(util.Atoi(match[1]))&(^maskFloat))|mask|maskOr)] = uint64(util.Atoi(match[2])) & mask36
 			}
 		} else {
-			log.Println(len(match))
 			util.Panic("No match for %q", l)
 		}
 	}
