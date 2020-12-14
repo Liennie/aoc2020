@@ -56,3 +56,23 @@ func Atoi(s string) int {
 func Panic(format string, a ...interface{}) {
 	panic(fmt.Errorf(format, a...))
 }
+
+func Perm(n int) [][]int {
+	if n < 0 {
+		Panic("Perm(%d)", n)
+	}
+
+	if n == 0 {
+		return [][]int{{}}
+	}
+
+	res := Perm(n - 1)
+	l := len(res)
+	for i := 0; i < l; i++ {
+		p := make([]int, len(res[i]))
+		copy(p, res[i])
+		p = append(p, n-1)
+		res = append(res, p)
+	}
+	return res
+}
