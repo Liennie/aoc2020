@@ -48,5 +48,4 @@ func main() {
 
 	// Part 2
 	log.Part2(solve(numbers, 30000000))
-
 }
