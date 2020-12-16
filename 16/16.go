@@ -41,6 +41,15 @@ func (r multiRange) inRange(n int) bool {
 
 type rules map[string]multiRange
 
+func (r rules) valid(n int) bool {
+	for _, mr := range r {
+		if mr.inRange(n) {
+			return true
+		}
+	}
+	return false
+}
+
 type ticket []int
 
 func parse(filename string) (rules, ticket, []ticket) {
@@ -84,6 +93,9 @@ func parse(filename string) (rules, ticket, []ticket) {
 		for _, n := range strings.Split(l, ",") {
 			t = append(t, util.Atoi(n))
 		}
+		if len(t) != len(mt) {
+			util.Panic("Invalid ticket length: %d; should be %d", len(t), len(mt))
+		}
 		nt = append(nt, t)
 	}
 
@@ -93,23 +105,73 @@ func parse(filename string) (rules, ticket, []ticket) {
 func main() {
 	defer util.Recover(log.Err)
 
-	rs, _, nt := parse("input.txt")
+	rs, mt, nt := parse("input.txt")
 
 	// Part 1
 	sum := 0
 	for _, t := range nt {
 		for _, n := range t {
-			valid := false
-			for _, r := range rs {
-				if r.inRange(n) {
-					valid = true
-					break
-				}
-			}
-			if !valid {
+			if !rs.valid(n) {
 				sum += n
 			}
 		}
 	}
 	log.Part1(sum)
+
+	// Part 2
+	nnt := []ticket{}
+	for _, t := range nt {
+		valid := true
+		for _, n := range t {
+			if !rs.valid(n) {
+				valid = false
+				break
+			}
+		}
+		if valid {
+			nnt = append(nnt, t)
+		}
+	}
+	nt = nnt
+
+	fs := map[string]map[int]bool{}
+	for r := range rs {
+		fs[r] = map[int]bool{}
+		for i := range mt {
+			fs[r][i] = true
+		}
+	}
+
+	for _, t := range append(nt, mt) {
+		for i, n := range t {
+			for r, mr := range rs {
+				if !mr.inRange(n) {
+					delete(fs[r], i)
+				}
+			}
+		}
+	}
+
+	res := map[string]int{}
+	for len(fs) > 0 {
+		for f, s := range fs {
+			if len(s) == 1 {
+				for k := range s {
+					res[f] = k
+				}
+				for _, s := range fs {
+					delete(s, res[f])
+				}
+				delete(fs, f)
+			}
+		}
+	}
+
+	prod := 1
+	for f, i := range res {
+		if strings.HasPrefix(f, "departure") {
+			prod *= mt[i]
+		}
+	}
+	log.Part2(prod)
 }
