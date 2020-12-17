@@ -58,12 +58,12 @@ func parse(filename string) grid {
 	}
 }
 
-func (g *grid) neighbors(p point) int {
+func (g *grid) neighbors(p, r point) int {
 	count := 0
-	for x := p.x - 1; x <= p.x+1; x++ {
-		for y := p.y - 1; y <= p.y+1; y++ {
-			for z := p.z - 1; z <= p.z+1; z++ {
-				for w := p.w - 1; w <= p.w+1; w++ {
+	for x := p.x - r.x; x <= p.x+r.x; x++ {
+		for y := p.y - r.y; y <= p.y+r.y; y++ {
+			for z := p.z - r.z; z <= p.z+r.z; z++ {
+				for w := p.w - r.w; w <= p.w+r.w; w++ {
 					if (x != p.x || y != p.y || z != p.z || w != p.w) && g.cells[point{x, y, z, w}] {
 						count++
 					}
@@ -74,56 +74,24 @@ func (g *grid) neighbors(p point) int {
 	return count
 }
 
-func (g *grid) step3() {
+func (g *grid) step(r point) {
 	min := point{}
 	max := point{}
 	cells := map[point]bool{}
 
-	for x := g.min.x - 1; x <= g.max.x+1; x++ {
-		for y := g.min.y - 1; y <= g.max.y+1; y++ {
-			for z := g.min.z - 1; z <= g.max.z+1; z++ {
-				if g.cells[point{x, y, z, 0}] {
-					if n := g.neighbors(point{x, y, z, 0}); n == 2 || n == 3 {
-						// Cell remains active
-						cells[point{x, y, z, 0}] = true
-						min = min.min(point{x, y, z, 0})
-						max = max.max(point{x, y, z, 0})
-					}
-				} else {
-					if n := g.neighbors(point{x, y, z, 0}); n == 3 {
-						// Cell becomes active
-						cells[point{x, y, z, 0}] = true
-						min = min.min(point{x, y, z, 0})
-						max = max.max(point{x, y, z, 0})
-					}
-				}
-			}
-		}
-	}
-
-	g.min = min
-	g.max = max
-	g.cells = cells
-}
-
-func (g *grid) step4() {
-	min := point{}
-	max := point{}
-	cells := map[point]bool{}
-
-	for x := g.min.x - 1; x <= g.max.x+1; x++ {
-		for y := g.min.y - 1; y <= g.max.y+1; y++ {
-			for z := g.min.z - 1; z <= g.max.z+1; z++ {
-				for w := g.min.w - 1; w <= g.max.w+1; w++ {
+	for x := g.min.x - r.x; x <= g.max.x+r.x; x++ {
+		for y := g.min.y - r.y; y <= g.max.y+r.y; y++ {
+			for z := g.min.z - r.z; z <= g.max.z+r.z; z++ {
+				for w := g.min.w - r.w; w <= g.max.w+r.w; w++ {
 					if g.cells[point{x, y, z, w}] {
-						if n := g.neighbors(point{x, y, z, w}); n == 2 || n == 3 {
+						if n := g.neighbors(point{x, y, z, w}, r); n == 2 || n == 3 {
 							// Cell remains active
 							cells[point{x, y, z, w}] = true
 							min = min.min(point{x, y, z, w})
 							max = max.max(point{x, y, z, w})
 						}
 					} else {
-						if n := g.neighbors(point{x, y, z, w}); n == 3 {
+						if n := g.neighbors(point{x, y, z, w}, r); n == 3 {
 							// Cell becomes active
 							cells[point{x, y, z, w}] = true
 							min = min.min(point{x, y, z, w})
@@ -179,14 +147,14 @@ func main() {
 	// Part 1
 	g := og.clone()
 	for i := 0; i < 6; i++ {
-		g.step3()
+		g.step(point{1, 1, 1, 0})
 	}
 	log.Part1(len(g.cells))
 
 	// Part 2
 	g = og.clone()
 	for i := 0; i < 6; i++ {
-		g.step4()
+		g.step(point{1, 1, 1, 1})
 	}
 	log.Part2(len(g.cells))
 }
