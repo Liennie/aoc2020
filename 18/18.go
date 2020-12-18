@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/liennie/aoc2020/common/load"
 	"github.com/liennie/aoc2020/common/log"
@@ -10,12 +12,17 @@ import (
 
 type expr interface {
 	eval() int
+	fmt.Stringer
 }
 
 type constExpr int
 
 func (e constExpr) eval() int {
 	return int(e)
+}
+
+func (e constExpr) String() string {
+	return strconv.Itoa(int(e))
 }
 
 type opExpr struct {
@@ -39,6 +46,22 @@ func (e opExpr) eval() int {
 	}
 
 	return res
+}
+
+func (e opExpr) String() string {
+	b := &strings.Builder{}
+	b.WriteRune('(')
+	for i, ex := range e.ex {
+		if i > 0 {
+			b.WriteRune(' ')
+			b.WriteRune(e.op[i-1])
+			b.WriteRune(' ')
+		}
+
+		b.WriteString(ex.String())
+	}
+	b.WriteRune(')')
+	return b.String()
 }
 
 type tokenType int
@@ -163,6 +186,36 @@ func parse(filename string) []expr {
 	return res
 }
 
+func precedence(ex expr) expr {
+	if _, ok := ex.(constExpr); ok {
+		return ex
+	}
+
+	if ex, ok := ex.(opExpr); ok {
+		res := opExpr{
+			ex: []expr{precedence(ex.ex[0])},
+		}
+		for i, op := range ex.op {
+			if op == '+' {
+				last := res.ex[len(res.ex)-1]
+				res.ex[len(res.ex)-1] = opExpr{
+					ex: []expr{last, precedence(ex.ex[i+1])},
+					op: []rune{'+'},
+				}
+			} else if op == '*' {
+				res.ex = append(res.ex, precedence(ex.ex[i+1]))
+				res.op = append(res.op, '*')
+			} else {
+				util.Panic("Invalid operator %q", string(op))
+			}
+		}
+		return res
+	}
+
+	util.Panic("Unknown expr type %T", ex)
+	return nil
+}
+
 func main() {
 	defer util.Recover(log.Err)
 
@@ -174,4 +227,11 @@ func main() {
 		sum += e.eval()
 	}
 	log.Part1(sum)
+
+	// Part 2
+	sum = 0
+	for _, e := range r {
+		sum += precedence(e).eval()
+	}
+	log.Part2(sum)
 }
