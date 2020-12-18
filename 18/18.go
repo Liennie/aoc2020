@@ -31,10 +31,6 @@ type opExpr struct {
 }
 
 func (e opExpr) eval() int {
-	if len(e.ex) != len(e.op)+1 {
-		util.Panic("Lengths don't match: %d, %d", len(e.ex), len(e.op))
-	}
-
 	res := e.ex[0].eval()
 	for i, op := range e.op {
 		switch op {
@@ -153,7 +149,7 @@ func parseExpr(tokens []token) (expr, int) {
 				if ni == -1 {
 					util.Panic("Unexpected end of expression")
 				}
-				i += ni + 1
+				i += ni
 				ex.ex = append(ex.ex, e)
 			} else {
 				util.Panic("Invalid token %q, pos %d, expected expression", t, t.pos)
@@ -161,7 +157,7 @@ func parseExpr(tokens []token) (expr, int) {
 			ee = false
 		} else {
 			if t.tt == ttRParen {
-				return ex, i
+				return ex, i + 1
 			} else if t.tt == ttPlus || t.tt == ttMul {
 				ex.op = append(ex.op, rune(t.val))
 			} else {
@@ -169,6 +165,10 @@ func parseExpr(tokens []token) (expr, int) {
 			}
 			ee = true
 		}
+	}
+
+	if len(ex.ex) != len(ex.op)+1 {
+		util.Panic("Unexpected end of expression")
 	}
 
 	return ex, -1
