@@ -54,39 +54,47 @@ func (r *recRule) validate(msg string, rules map[int]rule) []int {
 	return util.Uniq(res)
 }
 
+var (
+	ruleRe = regexp.MustCompile(`^(\d+): (?:(".*?")|(\d+(?: \d+)*(?: \| \d+(?: \d+)*)*))$`)
+)
+
+func parseRule(l string) (int, rule) {
+	match := ruleRe.FindStringSubmatch(l)
+	if len(match) != 4 {
+		util.Panic("No match for %q", l)
+	}
+
+	i := util.Atoi(match[1])
+
+	if match[2] != "" {
+		return i, &constRule{strings.Trim(match[2], "\"")}
+	} else {
+		r := &recRule{}
+		for _, rss := range strings.Split(match[3], "|") {
+			rs := []int{}
+			for _, rr := range strings.Split(strings.TrimSpace(rss), " ") {
+				rs = append(rs, util.Atoi(rr))
+			}
+			r.rules = append(r.rules, rs)
+		}
+		return i, r
+	}
+}
+
 func parse(filename string) (map[int]rule, []string) {
 	ch := load.File(filename)
 
-	ruleRe := regexp.MustCompile(`^(\d+): (?:(".*?")|(\d+(?: \d+)*(?: \| \d+(?: \d+)*)*))$`)
 	rules := map[int]rule{}
 	for l := range ch {
 		if l == "" {
 			break
 		}
 
-		match := ruleRe.FindStringSubmatch(l)
-		if len(match) != 4 {
-			util.Panic("No match for %q", l)
-		}
-
-		i := util.Atoi(match[1])
+		i, r := parseRule(l)
 		if rules[i] != nil {
 			util.Panic("Rule %d already exists", i)
 		}
-
-		if match[2] != "" {
-			rules[i] = &constRule{strings.Trim(match[2], "\"")}
-		} else {
-			r := &recRule{}
-			for _, rss := range strings.Split(match[3], "|") {
-				rs := []int{}
-				for _, rr := range strings.Split(strings.TrimSpace(rss), " ") {
-					rs = append(rs, util.Atoi(rr))
-				}
-				r.rules = append(r.rules, rs)
-			}
-			rules[i] = r
-		}
+		rules[i] = r
 	}
 
 	messages := []string{}
@@ -114,4 +122,15 @@ func main() {
 		}
 	}
 	log.Part1(count)
+
+	// Part 2
+	_, rules[8] = parseRule("8: 42 | 42 8")
+	_, rules[11] = parseRule("11: 42 31 | 42 11 31")
+	count = 0
+	for _, msg := range messages {
+		if util.Contains(rule0.validate(msg, rules), len(msg)) {
+			count++
+		}
+	}
+	log.Part2(count)
 }
