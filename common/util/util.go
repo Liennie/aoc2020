@@ -87,3 +87,26 @@ func Comb(n int) [][]int {
 	}
 	return res
 }
+
+func Uniq(ns []int) []int {
+	res := []int{}
+	s := map[int]bool{}
+
+	for _, n := range ns {
+		if !s[n] {
+			s[n] = true
+			res = append(res, n)
+		}
+	}
+
+	return res
+}
+
+func Contains(ns []int, n int) bool {
+	for _, m := range ns {
+		if m == n {
+			return true
+		}
+	}
+	return false
+}
