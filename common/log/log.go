@@ -4,6 +4,10 @@ import (
 	"log"
 )
 
+func init() {
+	log.SetFlags(log.Ltime | log.Lmicroseconds)
+}
+
 func Err(err error) {
 	log.Printf("Error: %s", err)
 }
