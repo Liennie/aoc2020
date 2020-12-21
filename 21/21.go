@@ -1,6 +1,7 @@
 package main
 
 import (
+	"sort"
 	"strings"
 
 	"github.com/liennie/aoc2020/common/load"
@@ -104,4 +105,20 @@ func main() {
 		}
 	}
 	log.Part1(count)
+
+	// Part 2
+	keys := []string{}
+	for a := range allergenIngredients {
+		keys = append(keys, a)
+	}
+	sort.Strings(keys)
+
+	b := &strings.Builder{}
+	for i, k := range keys {
+		if i > 0 {
+			b.WriteRune(',')
+		}
+		b.WriteString(allergenIngredients[k])
+	}
+	log.Part2(b.String())
 }

@@ -12,12 +12,12 @@ func Err(err error) {
 	log.Printf("Error: %s", err)
 }
 
-func Part1(n int) {
-	log.Printf("Part 1: %d", n)
+func Part1(n interface{}) {
+	log.Printf("Part 1: %v", n)
 }
 
-func Part2(n int) {
-	log.Printf("Part 2: %d", n)
+func Part2(n interface{}) {
+	log.Printf("Part 2: %v", n)
 }
 
 func Print(v ...interface{}) {
