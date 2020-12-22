@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/liennie/aoc2020/common/load"
 	"github.com/liennie/aoc2020/common/log"
 	"github.com/liennie/aoc2020/common/util"
@@ -54,6 +56,47 @@ func combat(op1, op2 []int) ([]int, []int) {
 	return p1, p2
 }
 
+func recursiveCombat(op1, op2 []int) ([]int, []int) {
+	p1 := make([]int, len(op1))
+	p2 := make([]int, len(op2))
+	copy(p1, op1)
+	copy(p2, op2)
+
+	prev := map[string]bool{}
+	prevKey := func() string {
+		return fmt.Sprint(p1, p2)
+	}
+
+	for len(p1) > 0 && len(p2) > 0 {
+		if prev[prevKey()] {
+			return append(p1, p2...), []int{}
+		}
+		prev[prevKey()] = true
+
+		p1c := p1[0]
+		p2c := p2[0]
+		p1 = p1[1:]
+		p2 = p2[1:]
+
+		if p1c <= len(p1) && p2c <= len(p2) {
+			p1r, p2r := recursiveCombat(p1[:p1c], p2[:p2c])
+			if len(p1r) > len(p2r) {
+				p1 = append(p1, p1c, p2c)
+			} else {
+				p2 = append(p2, p2c, p1c)
+			}
+		} else if p1c > p2c {
+			p1 = append(p1, p1c, p2c)
+		} else if p2c > p1c {
+			p2 = append(p2, p2c, p1c)
+		} else {
+			util.Panic("Cards are equal")
+		}
+	}
+
+	return p1, p2
+}
+
 func score(w []int) int {
 	score := 0
 	l := len(w)
@@ -74,5 +117,13 @@ func main() {
 		log.Part1(score(p1))
 	} else {
 		log.Part1(score(p2))
+	}
+
+	// Part 2
+	p1, p2 = recursiveCombat(op1, op2)
+	if len(p1) > len(p2) {
+		log.Part2(score(p1))
+	} else {
+		log.Part2(score(p2))
 	}
 }
