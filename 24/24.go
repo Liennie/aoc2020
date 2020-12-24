@@ -83,6 +83,34 @@ func parse(filename string) []point {
 	return res
 }
 
+func next(grid map[point]bool) map[point]bool {
+	n := map[point]int{}
+	for p := range grid {
+		for x := -1; x <= 1; x++ {
+			for y := -1; y <= 1; y++ {
+				if x != y {
+					n[point{p.x + x, p.y + y}]++
+				}
+			}
+		}
+	}
+
+	next := map[point]bool{}
+	for p, c := range n {
+		if grid[p] {
+			if c == 1 || c == 2 {
+				next[p] = true
+			}
+		} else {
+			if c == 2 {
+				next[p] = true
+			}
+		}
+	}
+
+	return next
+}
+
 func main() {
 	defer util.Recover(log.Err)
 
@@ -98,4 +126,10 @@ func main() {
 		}
 	}
 	log.Part1(len(grid))
+
+	// Part 2
+	for i := 0; i < 100; i++ {
+		grid = next(grid)
+	}
+	log.Part2(len(grid))
 }
